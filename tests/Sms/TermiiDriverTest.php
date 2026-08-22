@@ -11,13 +11,14 @@ class TermiiDriverTest extends TestCase
     public function test_successful_send_returns_success_result(): void
     {
         $http = new HttpFactory();
-        $http->fake(['*/api/sms/send' => $http::response(['code' => 'ok', 'message_id' => 'abc'], 200)]);
+        $http->fake(['*/api/sms/send' => $http::response(['code' => 'ok', 'message_id' => 'abc', 'balance' => 150.5], 200)]);
 
         $driver = new TermiiDriver($http, 'test-key', 'WelfareBank', 'https://api.ng.termii.com');
         $result = $driver->send('08012345678', 'Your account was credited ₦5,000.00');
 
         $this->assertTrue($result->successful);
         $this->assertSame('termii', $result->provider);
+        $this->assertSame(150.5, $result->meta['balance']);
     }
 
     public function test_phone_number_is_normalized_to_e164_before_sending(): void

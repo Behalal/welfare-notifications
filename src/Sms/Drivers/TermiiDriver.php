@@ -40,6 +40,7 @@ final class TermiiDriver implements SmsProvider
 
             $body = $response->json();
             $successful = $response->successful() && (($body['code'] ?? null) === 'ok');
+            $meta = isset($body['balance']) ? ['balance' => $body['balance']] : [];
 
             if (!$successful) {
                 Log::warning('Termii SMS send failed', [
@@ -49,8 +50,8 @@ final class TermiiDriver implements SmsProvider
             }
 
             return $successful
-                ? SendResult::success('termii')
-                : SendResult::failure('termii', $body['message'] ?? 'Termii rejected the request');
+                ? SendResult::success('termii', meta: $meta)
+                : SendResult::failure('termii', $body['message'] ?? 'Termii rejected the request', $meta);
         } catch (\Throwable $e) {
             Log::error('Termii SMS send threw', ['to' => PhoneNumber::mask($to), 'error' => $e->getMessage()]);
 

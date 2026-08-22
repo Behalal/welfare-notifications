@@ -3,8 +3,12 @@
 namespace Welfare\Notifications;
 
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
+use Welfare\Notifications\Events\NotificationDispatched;
 use Welfare\Notifications\Push\SendPushJob;
 use Welfare\Notifications\Sms\SendSmsJob;
+use Welfare\Notifications\Sms\SmsManager;
+use Welfare\Notifications\Support\SendResult;
 
 /**
  * Single entry point for outbound SMS/push notifications. Every send in
@@ -31,6 +35,8 @@ final class NotificationDispatcher
 {
     public function __construct(
         private readonly BusDispatcher $bus,
+        private readonly SmsManager $sms,
+        private readonly EventDispatcher $events,
     ) {
     }
 
@@ -66,5 +72,32 @@ final class NotificationDispatcher
                 $payload->metadata,
             ));
         }
+    }
+
+    /**
+     * Send one SMS immediately (no queue) and unconditionally (no
+     * preference check) — for OTP/verification codes and similar, where
+     * the customer is actively waiting on-screen and the message MUST
+     * arrive regardless of their sms_notifications_enabled setting (opting
+     * out of marketing/alert SMS must never be able to lock someone out of
+     * their own login or a PIN reset).
+     *
+     * Deliberately a distinct method rather than a $forceSms flag on
+     * send(): that method's $force already has an established, narrower
+     * meaning (bypass push preference only, never SMS, for cost reasons —
+     * see its docblock) used by security alerts that must NOT also start
+     * forcing SMS. Conflating the two would silently change that behavior.
+     *
+     * Still goes through the same provider-swap machinery as send() — the
+     * SMS_PROVIDER env var applies here too — so this is not a bypass of
+     * the package, just a different delivery mode within it.
+     */
+    public function sendSmsNow(string $phoneNumber, string $message, string $action = 'notification', ?string $recipientIdentifier = null): SendResult
+    {
+        $result = $this->sms->driver()->send($phoneNumber, $message);
+
+        $this->events->dispatch(new NotificationDispatched('sms', $result, $action, $recipientIdentifier));
+
+        return $result;
     }
 }

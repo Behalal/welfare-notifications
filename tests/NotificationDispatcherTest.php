@@ -14,7 +14,7 @@ class NotificationDispatcherTest extends TestCase
     public function test_sends_sms_and_push_when_recipient_opted_into_both(): void
     {
         $bus = new RecordingBusDispatcher();
-        $dispatcher = new NotificationDispatcher($bus);
+        $dispatcher = $this->makeDispatcher($bus);
 
         $recipient = new Recipient(
             email: 'jane@example.com',
@@ -34,7 +34,7 @@ class NotificationDispatcherTest extends TestCase
     public function test_does_not_sms_a_recipient_who_opted_out(): void
     {
         $bus = new RecordingBusDispatcher();
-        $dispatcher = new NotificationDispatcher($bus);
+        $dispatcher = $this->makeDispatcher($bus);
 
         $recipient = new Recipient(
             email: 'jane@example.com',
@@ -54,7 +54,7 @@ class NotificationDispatcherTest extends TestCase
     public function test_never_dispatches_sms_or_push_without_contact_details_even_if_opted_in(): void
     {
         $bus = new RecordingBusDispatcher();
-        $dispatcher = new NotificationDispatcher($bus);
+        $dispatcher = $this->makeDispatcher($bus);
 
         $recipient = new Recipient(
             email: 'jane@example.com',
@@ -74,7 +74,7 @@ class NotificationDispatcherTest extends TestCase
     public function test_force_bypasses_push_opt_out_but_never_sms(): void
     {
         $bus = new RecordingBusDispatcher();
-        $dispatcher = new NotificationDispatcher($bus);
+        $dispatcher = $this->makeDispatcher($bus);
 
         $recipient = new Recipient(
             email: 'jane@example.com',
@@ -94,7 +94,7 @@ class NotificationDispatcherTest extends TestCase
     public function test_sms_uses_the_short_override_body_when_provided(): void
     {
         $bus = new RecordingBusDispatcher();
-        $dispatcher = new NotificationDispatcher($bus);
+        $dispatcher = $this->makeDispatcher($bus);
 
         $recipient = new Recipient(
             email: null,
@@ -114,6 +114,18 @@ class NotificationDispatcherTest extends TestCase
         /** @var SendSmsJob $job */
         $job = $bus->dispatched(SendSmsJob::class)[0];
         $this->assertSame('Short SMS body', $job->message);
+    }
+
+    public function test_send_sms_now_delivers_immediately_without_a_recipient_or_preference_check(): void
+    {
+        $bus = new RecordingBusDispatcher();
+        $dispatcher = $this->makeDispatcher($bus);
+
+        $result = $dispatcher->sendSmsNow('08012345678', 'Your OTP is 123456');
+
+        // No job queued — this bypasses the Bus entirely, unlike send().
+        $this->assertFalse($bus->wasDispatched(SendSmsJob::class));
+        $this->assertSame('termii', $result->provider);
     }
 }
 

@@ -29,6 +29,7 @@ final class TermiiDriver implements SmsProvider
             $response = $this->http
                 ->timeout(10)
                 ->withHeaders(['Accept' => 'application/json'])
+                ->asJson()
                 ->post(rtrim($this->endpoint, '/') . '/api/sms/send', [
                     'api_key' => $this->apiKey,
                     'to' => PhoneNumber::toE164($to),

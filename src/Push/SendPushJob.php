@@ -30,6 +30,7 @@ class SendPushJob implements ShouldQueue
         public readonly array $data = [],
         public readonly string $action = 'notification',
         public readonly ?string $recipientIdentifier = null,
+        public readonly array $metadata = [],
     ) {
     }
 
@@ -37,7 +38,7 @@ class SendPushJob implements ShouldQueue
     {
         $result = $push->driver()->send($this->token, $this->title, $this->body, $this->data);
 
-        $events->dispatch(new NotificationDispatched('push', $result, $this->action, $this->recipientIdentifier));
+        $events->dispatch(new NotificationDispatched('push', $result, $this->action, $this->recipientIdentifier, $this->metadata));
 
         if (!$result->successful) {
             Log::warning('Push notification not delivered', [

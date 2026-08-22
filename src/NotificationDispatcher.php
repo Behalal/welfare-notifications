@@ -51,6 +51,7 @@ final class NotificationDispatcher
                 $payload->smsMessage(),
                 $payload->action,
                 $recipient->identifier,
+                $payload->metadata,
             ));
         }
 
@@ -62,6 +63,7 @@ final class NotificationDispatcher
                 $payload->pushData,
                 $payload->action,
                 $recipient->identifier,
+                $payload->metadata,
             ));
         }
     }

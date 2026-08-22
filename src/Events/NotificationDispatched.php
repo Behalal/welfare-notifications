@@ -18,6 +18,7 @@ final class NotificationDispatched
         public readonly SendResult $result,
         public readonly string $action,
         public readonly ?string $recipientIdentifier,
+        public readonly array $metadata = [],
     ) {
     }
 }

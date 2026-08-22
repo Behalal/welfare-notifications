@@ -27,6 +27,13 @@ final readonly class NotificationPayload
         public array $pushData = [],
         /** Short identifier for the notification kind (e.g. 'credit_alert') — used for logging only, never sent to the provider. */
         public string $action = 'notification',
+        /**
+         * Free-form context for your own audit trail — never sent to any
+         * provider, only carried through on NotificationDispatched so a
+         * listener can log it wherever your app already keeps records
+         * (e.g. mandate_id, amount, reference).
+         */
+        public array $metadata = [],
     ) {
     }
 

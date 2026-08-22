@@ -44,6 +44,7 @@ class SendSmsJob implements ShouldQueue
         public readonly string $message,
         public readonly string $action = 'notification',
         public readonly ?string $recipientIdentifier = null,
+        public readonly array $metadata = [],
     ) {
     }
 
@@ -51,7 +52,7 @@ class SendSmsJob implements ShouldQueue
     {
         $result = $sms->driver()->send($this->phoneNumber, $this->message);
 
-        $events->dispatch(new NotificationDispatched('sms', $result, $this->action, $this->recipientIdentifier));
+        $events->dispatch(new NotificationDispatched('sms', $result, $this->action, $this->recipientIdentifier, $this->metadata));
 
         if (!$result->successful) {
             Log::warning('SMS notification not delivered', [

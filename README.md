@@ -48,7 +48,9 @@ Laravel auto-discovers `Welfare\Notifications\NotificationsServiceProvider`.
 php artisan vendor:publish --tag=notifications-config
 ```
 
-Fill in whichever provider's credentials you're using in `.env` — see `config/notifications.php` for the full list of env vars (`TERMII_*`, `AFRICASTALKING_*`, `TWILIO_*`, `FIREBASE_*`).
+Fill in whichever provider's credentials you're using in `.env` — see `config/welfare-notifications.php` for the full list of env vars (`TERMII_*`, `AFRICASTALKING_*`, `TWILIO_*`, `FIREBASE_*`).
+
+Config key is `welfare-notifications`, not the generic `notifications` — deliberately namespaced, since a host app may well already have its own `config/notifications.php` for unrelated settings (this is exactly what happened wiring the package into welfareMFB: its existing `notifications.sms`/`notifications.push` keys would have silently shadowed this package's driver config under Laravel's shallow `mergeConfigFrom()`).
 
 ## Usage
 

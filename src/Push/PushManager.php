@@ -18,12 +18,12 @@ final class PushManager extends Manager
 {
     public function getDefaultDriver(): string
     {
-        return $this->config->get('notifications.push.driver', 'firebase');
+        return $this->config->get('welfare-notifications.push.driver', 'firebase');
     }
 
     protected function createFirebaseDriver(): FirebaseDriver
     {
-        $config = $this->config->get('notifications.push.firebase', []);
+        $config = $this->config->get('welfare-notifications.push.firebase', []);
 
         $events = $this->container->bound(EventDispatcher::class)
             ? $this->container->make(EventDispatcher::class)

@@ -17,7 +17,7 @@ class PushManagerTest extends TestCase
 
     public function test_unknown_driver_throws(): void
     {
-        $manager = new PushManager($this->makeContainer(['notifications' => ['push' => ['driver' => 'onesignal']]]));
+        $manager = new PushManager($this->makeContainer(['welfare-notifications' => ['push' => ['driver' => 'onesignal']]]));
 
         $this->expectException(\InvalidArgumentException::class);
         $manager->driver();

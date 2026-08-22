@@ -21,12 +21,12 @@ final class SmsManager extends Manager
 {
     public function getDefaultDriver(): string
     {
-        return $this->config->get('notifications.sms.driver', 'termii');
+        return $this->config->get('welfare-notifications.sms.driver', 'termii');
     }
 
     protected function createTermiiDriver(): TermiiDriver
     {
-        $config = $this->config->get('notifications.sms.termii', []);
+        $config = $this->config->get('welfare-notifications.sms.termii', []);
 
         return new TermiiDriver(
             $this->httpFactory(),
@@ -39,7 +39,7 @@ final class SmsManager extends Manager
 
     protected function createAfricastalkingDriver(): AfricasTalkingDriver
     {
-        $config = $this->config->get('notifications.sms.africastalking', []);
+        $config = $this->config->get('welfare-notifications.sms.africastalking', []);
 
         return new AfricasTalkingDriver(
             $this->httpFactory(),
@@ -52,7 +52,7 @@ final class SmsManager extends Manager
 
     protected function createTwilioDriver(): TwilioDriver
     {
-        $config = $this->config->get('notifications.sms.twilio', []);
+        $config = $this->config->get('welfare-notifications.sms.twilio', []);
 
         return new TwilioDriver(
             $this->httpFactory(),

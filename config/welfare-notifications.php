@@ -6,8 +6,12 @@
 |--------------------------------------------------------------------------
 |
 | This is the template config the package ships. The host app's own
-| config/notifications.php (published via the command below) takes
-| precedence for any key it defines.
+| config/welfare-notifications.php (published via the command below) takes
+| precedence for any key it defines. Deliberately namespaced (not just
+| "notifications") — a host app may already own a plain
+| config/notifications.php for unrelated settings, and Laravel's
+| mergeConfigFrom() only shallow-merges, so a generic key name risks a
+| silent collision (this happened wiring the package into welfareMFB).
 |
 |   php artisan vendor:publish --tag=notifications-config
 |

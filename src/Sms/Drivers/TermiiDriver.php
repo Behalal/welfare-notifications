@@ -32,7 +32,10 @@ final class TermiiDriver implements SmsProvider
                 ->asJson()
                 ->post(rtrim($this->endpoint, '/') . '/api/sms/send', [
                     'api_key' => $this->apiKey,
-                    'to' => PhoneNumber::toE164($to),
+                    // Termii's documented format is digits-only ("2347...", no
+                    // leading "+"), unlike Twilio/Africa's Talking which want
+                    // standard E.164 -- confirmed against production 400s.
+                    'to' => ltrim(PhoneNumber::toE164($to), '+'),
                     'from' => $this->senderId,
                     'sms' => $message,
                     'type' => 'plain',

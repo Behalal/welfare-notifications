@@ -21,8 +21,11 @@ class TermiiDriverTest extends TestCase
         $this->assertSame(150.5, $result->meta['balance']);
     }
 
-    public function test_phone_number_is_normalized_to_e164_before_sending(): void
+    public function test_phone_number_is_sent_digits_only_without_leading_plus(): void
     {
+        // Termii's documented format is "2348012345678", not the standard
+        // E.164 "+2348012345678" -- a leading "+" gets a 400 field-validation
+        // rejection in production (confirmed against live Termii).
         $http = new HttpFactory();
         $http->fake(['*/api/sms/send' => $http::response(['code' => 'ok'], 200)]);
 
@@ -30,7 +33,7 @@ class TermiiDriverTest extends TestCase
         $driver->send('08012345678', 'Test');
 
         $http->assertSent(function ($request) {
-            return $request['to'] === '+2348012345678';
+            return $request['to'] === '2348012345678';
         });
     }
 

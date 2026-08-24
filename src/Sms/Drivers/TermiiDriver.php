@@ -47,9 +47,15 @@ final class TermiiDriver implements SmsProvider
             $meta = isset($body['balance']) ? ['balance' => $body['balance']] : [];
 
             if (!$successful) {
+                // Full response body logged deliberately -- Termii's error
+                // payload never echoes back the api_key or the message text,
+                // only field-level validation detail, so this is safe and is
+                // the only way to see *which* field Termii rejected instead
+                // of just the generic top-level message.
                 Log::warning('Termii SMS send failed', [
                     'to' => PhoneNumber::mask($to),
                     'status' => $response->status(),
+                    'response' => $body,
                 ]);
             }
 
